@@ -6,17 +6,17 @@ class ClassifierSVMLoader:
     def __init__(self, file_name):
         config_file = open(file_name, "rb")
         [statistics, classifier] = pickle.load(config_file)
-        self.statistics = statistics
-        self.classifier = classifier
+        self._statistics = statistics
+        self._classifier = classifier
 
     def _normalize_features(self, features):
         n_features = []
-        for i, [mean, std] in enumerate(self.statistics):
+        for i, [mean, std] in enumerate(self._statistics):
             n_features.append((features[i] - mean) / std)
         return n_features
 
     def predict(self, features):
-        return self.classifier.predict([self._normalize_features(features)])[0]
+        return self._classifier.predict([self._normalize_features(features)])[0]
 
 
 def main():
