@@ -4,6 +4,7 @@ import csv
 import numpy as np
 import time
 import random
+import pickle
 
 
 def read_data():
@@ -116,7 +117,7 @@ def get_training_and_test_sets(X, y, ratio):
 
 
 def main():
-    print("######## Room detector v0.1 ########\n")
+    print("######## Room detector trainer v0.1 ########\n")
     raw_data = read_data()
     full_features = add_extra_features(raw_data)
     [X, y, statistics] = normalize_samples(full_features)
@@ -156,6 +157,15 @@ def main():
             failed += 1
         print("Prediction for {0} (expected {1}): {2}".format(features, expected, prediction[0]))
     print("Assertion ratio: {}%".format(passed / 4 * 100))
+    print("---------------------------------------------------------\n")
+
+    print("---------------------------------------------------------")
+    timestamp = "_".join(str(time.time()).split("."))
+    filename = "results/svm-params-" + timestamp
+    print("Writing training data to '{}'".format(filename))
+    results = open(filename, "wb")
+    pickle.dump([statistics, classifier], results, pickle.HIGHEST_PROTOCOL)
+    results.close()
     print("---------------------------------------------------------\n")
 
 
