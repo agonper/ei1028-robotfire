@@ -92,8 +92,8 @@ class Robot:
 
 if __name__=="__main__":
 	try:
-		robot = Robot(TOUCH_CONFIG)
-		#robot = Robot(ULTRASONIC_CONFIG)
+		#robot = Robot(TOUCH_CONFIG)
+		robot = Robot(ULTRASONIC_CONFIG)
 		#robot = Robot(BRAITENBERG_CONFIG)
 		# print('Forward...')
 		# robot.motors(100,100)

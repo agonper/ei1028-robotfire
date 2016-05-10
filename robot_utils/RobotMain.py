@@ -4,18 +4,18 @@ import time
 from robot_utils.Robot2 import *
 
 from robot_utils.LineDetectorPublisher import LineDetectorPublisher
-from robot_utils.RoomController import RoomController
+from robot_utils.RoomController import *
 from robot_utils.WallAvoider import WallAvoider
 
 __author__ = 'Alberto'
 
 
 class RobotStatus:
-    START_ROOM = 0
-    PASSAGE = 1
-    UNEVALUATED_ROOM = 2
-    EMPTY_ROOM = 3
-    FIRE_ROOM = 4
+    START_ROOM = "START_ROOM"
+    PASSAGE = "PASSAGE"
+    UNEVALUATED_ROOM = "UNEVALUATED_ROOM"
+    EMPTY_ROOM = "EMPTY_ROOM"
+    FIRE_ROOM = "FIRE_ROOM"
 
     @staticmethod
     def next_status(status):
@@ -35,24 +35,32 @@ class RobotMain:
         self._last_notified = time.time()
 
     def run(self):
+        count = 0
         while True:
             if self._status == RobotStatus.START_ROOM:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.PASSAGE:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.UNEVALUATED_ROOM:
-                self._status = self._room_controller.evaluate_room()
+                print("Count: {}".format(count))
+                if count <= 3:
+                    self._wall_avoider.move_without_crashing()
+                    count += 1
+                else:
+                    count = 0
+                    self._status = self._room_controller.evaluate_room()
             if self._status == RobotStatus.EMPTY_ROOM:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.FIRE_ROOM:
                 self._room_controller.extinguish_fire()
             time.sleep(0.1)
 
-    def notify(self):
+    def notify(self, value):
         now = time.time()
         if now - self._last_notified > 1.0:
             self._last_notified = now
             self._status = RobotStatus.next_status(self._status)
+            print("Nuevo estado {}".format(self._status))
 
     def set_publisher(self, publisher):
         self._publisher = publisher
@@ -70,11 +78,12 @@ def main():
         light_detector.subscribe(brain_robot)
         light_detector.start_detecting()
         brain_robot.run()
-    except KeyboardInterrupt:
+    except:
         agent_robot.terminate()
         kill_signal.set()
         room_controller._camera.close()
         print("END")
+
 
 if __name__ == '__main__':
     main()
