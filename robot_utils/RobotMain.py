@@ -9,6 +9,8 @@ from robot_utils.WallAvoider import WallAvoider
 
 __author__ = 'Alberto'
 
+TIME_BETWEEN_NOTIFICATIONS = 2.0
+BEHAVIOR = "Simple"
 
 class RobotStatus:
     START_ROOM = "START_ROOM"
@@ -46,11 +48,14 @@ class RobotMain:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.FIRE_ROOM:
                 self._room_controller.extinguish_fire()
+                if BEHAVIOR == "Simple":
+                    break
+                self._status = RobotStatus.EMPTY_ROOM
             time.sleep(0.1)
 
     def notify(self, value):
         now = time.time()
-        if now - self._last_notified > 1.0:
+        if now - self._last_notified > TIME_BETWEEN_NOTIFICATIONS:
             self._last_notified = now
             self._status = RobotStatus.next_status(self._status)
             print("Nuevo estado {}".format(self._status))
