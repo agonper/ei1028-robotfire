@@ -1,5 +1,5 @@
-import threading
-import time
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 
 from robot_utils.Robot2 import *
 
@@ -35,20 +35,13 @@ class RobotMain:
         self._last_notified = time.time()
 
     def run(self):
-        count = 0
         while True:
             if self._status == RobotStatus.START_ROOM:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.PASSAGE:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.UNEVALUATED_ROOM:
-                print("Count: {}".format(count))
-                if count <= 3:
-                    self._wall_avoider.move_without_crashing()
-                    count += 1
-                else:
-                    count = 0
-                    self._status = self._room_controller.evaluate_room()
+                self._step_inside_room()
             if self._status == RobotStatus.EMPTY_ROOM:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.FIRE_ROOM:
@@ -65,12 +58,19 @@ class RobotMain:
     def set_publisher(self, publisher):
         self._publisher = publisher
 
+    def _step_inside_room(self):
+        for _ in range(4):
+            self._wall_avoider.move_without_crashing()
+            time.sleep(0.1)
+        self._status = self._room_controller.evaluate_room()
 
 def main():
     agent_robot = Robot(ULTRASONIC_CONFIG)
     kill_signal = threading.Event()
+
+    camera = PiCamera()
+    room_controller = RoomController(agent_robot, camera=camera, stream=PiRGBArray(camera))
     wall_avoider = WallAvoider(agent_robot)
-    room_controller = RoomController(agent_robot)
     light_detector = LineDetectorPublisher(agent_robot, kill_signal=kill_signal)
 
     try:
@@ -81,7 +81,7 @@ def main():
     except:
         agent_robot.terminate()
         kill_signal.set()
-        room_controller._camera.close()
+        camera.close()
         print("END")
 
 
