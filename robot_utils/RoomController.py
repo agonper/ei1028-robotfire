@@ -53,10 +53,11 @@ class RoomController:
                 return RobotStatus.FIRE_ROOM
             robot.motors(RobotSide.get_closer_to(farthest_side))
 
-            distances = self._calculate_distances()
             time.sleep(0.2)
+            distances = self._calculate_distances()
         print("No candle found")
 
+        robot.motors(0, 0)
         return RobotStatus.EMPTY_ROOM
 
     def _align_with_candle(self, offset=0):
