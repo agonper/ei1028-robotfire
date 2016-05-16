@@ -46,7 +46,7 @@ class RoomController:
         if distances[RobotSide.Left] > distances[RobotSide.Right]:
             farthest_side = RobotSide.Left
         
-        while distances[farthest_side] > 15:
+        while distances[farthest_side] > 16:
             print("Looking for the candle")
             found, x, y, w, h = self._get_candle_data()
             print("Image obtained")
