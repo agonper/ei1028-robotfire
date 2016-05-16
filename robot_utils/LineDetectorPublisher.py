@@ -7,8 +7,8 @@ __author__ = 'Alberto'
 class LineDetectorPublisher:
     def __init__(self, robot, kill_signal):
         self._robot = robot
-        self._kill_signal = kill_signal
         self._subscribers = set()
+        self._kill_signal = kill_signal
         self._lock = threading.RLock()
 
     def subscribe(self, subscriber):
@@ -21,10 +21,11 @@ class LineDetectorPublisher:
     def start_detecting(self):
         def detector(that):
             while True:
-                light = self._robot.light()
-                if self._kill_signal.is_set():
+                if that._kill_signal.is_set():
+                    print("killed")
                     break
-                if light < 530:
+                light = self._robot.light()
+                if light < 480:
                     that._trigger()
                 time.sleep(0.1)
 

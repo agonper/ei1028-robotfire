@@ -44,14 +44,16 @@ class RobotMain:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.UNEVALUATED_ROOM:
                 self._step_inside_room()
+                self._status = self._room_controller.evaluate_room()
             if self._status == RobotStatus.EMPTY_ROOM:
                 self._wall_avoider.move_without_crashing()
             if self._status == RobotStatus.FIRE_ROOM:
                 self._room_controller.extinguish_fire()
                 if BEHAVIOR == "Simple":
+                    print("Finishing run loop")
                     break
                 self._status = RobotStatus.EMPTY_ROOM
-            time.sleep(0.1)
+            time.sleep(0.2)
 
     def notify(self, value):
         now = time.time()
@@ -64,10 +66,9 @@ class RobotMain:
         self._publisher = publisher
 
     def _step_inside_room(self):
-        for _ in range(4):
+        for _ in range(15):
             self._wall_avoider.move_without_crashing()
             time.sleep(0.1)
-        self._status = self._room_controller.evaluate_room()
 
 def main():
     agent_robot = Robot(ULTRASONIC_CONFIG)
@@ -77,6 +78,7 @@ def main():
     room_controller = RoomController(agent_robot, camera=camera, stream=PiRGBArray(camera))
     wall_avoider = WallAvoider(agent_robot)
     light_detector = LineDetectorPublisher(agent_robot, kill_signal=kill_signal)
+    light_detector.daemon = True
 
     try:
         brain_robot = RobotMain(robot=agent_robot, wall_avoider=wall_avoider, room_controller=room_controller)
@@ -84,11 +86,12 @@ def main():
         light_detector.start_detecting()
         brain_robot.run()
     except:
-        agent_robot.terminate()
+        print("Exception")
+    finally:
         kill_signal.set()
+        agent_robot.terminate()
         camera.close()
         print("END")
-
 
 if __name__ == '__main__':
     main()

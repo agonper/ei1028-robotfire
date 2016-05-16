@@ -3,8 +3,8 @@ import Candle
 from robot_utils.RobotMain import RobotStatus
 from robot_utils.WallAvoider import WallAvoider
 
-APPROX_RATIO = 0.6
-DEVIATION_OFFSET = - (720 * APPROX_RATIO / 3)
+APPROX_RATIO = 0.19
+DEVIATION_OFFSET = int(- (720 * APPROX_RATIO / 2.2))
 
 
 class RobotSide:
@@ -14,9 +14,9 @@ class RobotSide:
     @staticmethod
     def get_closer_to(side):
         if side == RobotSide.Left:
-            return -40, 40
+            return -20, 20
         if side == RobotSide.Right:
-            return 40, -40
+            return 20, -20
 
 
 class RoomController:
@@ -30,8 +30,9 @@ class RoomController:
 
         self._align_with_candle()
         self._move_towards_the_candle()
-
-        while self._candle_is_on():
+        print("Aligned!!")
+        for i in range(10):
+            # while self._candle_is_on():
             robot.fan(200)
             time.sleep(0.1)
         time.sleep(1.0)
@@ -39,20 +40,23 @@ class RoomController:
 
     def evaluate_room(self):
         robot = self._robot
-
+        
         distances = self._calculate_distances()
         farthest_side = RobotSide.Right
         if distances[RobotSide.Left] > distances[RobotSide.Right]:
             farthest_side = RobotSide.Left
-
+        
         while distances[farthest_side] > 15:
+            print("Looking for the candle")
             found, x, y, w, h = self._get_candle_data()
+            print("Image obtained")
             if found:
                 robot.motors(0, 0)
                 print("Candle found!!")
                 return RobotStatus.FIRE_ROOM
-            robot.motors(RobotSide.get_closer_to(farthest_side))
-
+            (lm, rm) = RobotSide.get_closer_to(farthest_side)
+            robot.motors(lm, rm)
+            print("Not found")
             time.sleep(0.2)
             distances = self._calculate_distances()
         print("No candle found")
@@ -87,8 +91,9 @@ class RoomController:
         robot = self._robot
         found, x, y, w, h = self._get_candle_data()
         count = 0
-        while w < 720 * 0.6:
-            if count >= 10:
+        while w < 720 * APPROX_RATIO:
+            print("{0} / {1}".format(w, 720*APPROX_RATIO))
+            if count >= 5:
                 count = 0
                 self._align_with_candle()
 
@@ -102,7 +107,8 @@ class RoomController:
         self._stream.truncate(0)
         self._camera.capture(self._stream, format='bgr')
         image = self._stream.array
-        return Candle.position(image)
+        found, x, y, w, h = Candle.position(image)
+        return [found, x, y, w, h]
 
     def _candle_is_on(self):
         self._stream.truncate(0)
