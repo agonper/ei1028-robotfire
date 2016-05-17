@@ -76,7 +76,7 @@ def main():
 
     camera = PiCamera()
     room_controller = RoomController(agent_robot, camera=camera, stream=PiRGBArray(camera))
-    wall_avoider = WallAvoider(agent_robot)
+    wall_avoider = WallAvoider(agent_robot, kill_signal=kill_signal)
     light_detector = LineDetectorPublisher(agent_robot, kill_signal=kill_signal)
     light_detector.daemon = True
 
