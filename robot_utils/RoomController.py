@@ -1,5 +1,5 @@
 import time
-import Candle
+from robot_utils import Candle
 from robot_utils.RobotMain import RobotStatus
 from robot_utils.WallAvoider import WallAvoider
 
@@ -47,16 +47,13 @@ class RoomController:
             farthest_side = RobotSide.Left
         
         while distances[farthest_side] > 16:
-            print("Looking for the candle")
             found, x, y, w, h = self._get_candle_data()
-            print("Image obtained")
             if found:
                 robot.motors(0, 0)
                 print("Candle found!!")
                 return RobotStatus.FIRE_ROOM
             (lm, rm) = RobotSide.get_closer_to(farthest_side)
             robot.motors(lm, rm)
-            print("Not found")
             time.sleep(0.2)
             distances = self._calculate_distances()
         print("No candle found")
