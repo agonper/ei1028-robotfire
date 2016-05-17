@@ -43,23 +43,37 @@ class RoomController:
         
         distances = self._calculate_distances()
         farthest_side = RobotSide.Right
+        closest_side = RobotSide.Left
         if distances[RobotSide.Left] > distances[RobotSide.Right]:
-            farthest_side = RobotSide.Left
-        
-        while distances[farthest_side] > 16:
-            found, x, y, w, h = self._get_candle_data()
-            if found:
-                robot.motors(0, 0)
-                print("Candle found!!")
-                return RobotStatus.FIRE_ROOM
-            (lm, rm) = RobotSide.get_closer_to(farthest_side)
-            robot.motors(lm, rm)
-            time.sleep(0.2)
-            distances = self._calculate_distances()
+            farthest_side, closest_side = closest_side, farthest_side
+
+        try:
+            while distances[closest_side] > 16:
+                distances = self._look_for_candle_getting_closer_to(closest_side)
+
+            while distances[farthest_side] > 16:
+                distances = self._look_for_candle_getting_closer_to(farthest_side)
+
+        except StopIteration:
+            return RobotStatus.FIRE_ROOM
+
         print("No candle found")
 
         robot.motors(0, 0)
         return RobotStatus.EMPTY_ROOM
+
+    def _look_for_candle_getting_closer_to(self, side_to_approach):
+        robot = self._robot
+        found, x, y, w, h = self._get_candle_data()
+        if found:
+            robot.motors(0, 0)
+            print("Candle found!!")
+            raise StopIteration
+            # return RobotStatus.FIRE_ROOM
+        (lm, rm) = RobotSide.get_closer_to(side_to_approach)
+        robot.motors(lm, rm)
+        time.sleep(0.2)
+        return self._calculate_distances()
 
     def _align_with_candle(self, offset=0):
         robot = self._robot
