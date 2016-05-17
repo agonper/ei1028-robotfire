@@ -25,7 +25,7 @@ class LineDetectorPublisher:
                     print("killed")
                     break
                 light = self._robot.light()
-                if light < 480:
+                if 1 < light < 480:
                     that._trigger()
                 time.sleep(0.1)
 

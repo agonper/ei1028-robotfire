@@ -17,19 +17,19 @@ class WallAvoider:
         if not robot.error:
             (d_l, d_r) = WallAvoider.interpolate_distances((lv, rv))
 
-            if 14 <= d_r < 28 and 14 <= d_l < 28:
+            if 13 <= d_r < 28 and 13 <= d_l < 28:
                 robot.motors(70, 70)
-            elif d_r < 14:
-                robot.motors(0, 65)
-            elif d_l < 14:
-                robot.motors(65, 0)
+            elif d_r < 13:
+                robot.motors(0, 70)
+            elif d_l < 13:
+                robot.motors(70, 0)
             elif d_r >= 28 and d_l >= 28:
                 robot.motors(85, 40)
             else:
                 if d_r < d_l:
-                    robot.motors(40, 60)
+                    robot.motors(45, 70)
                 else:
-                    robot.motors(60, 40)
+                    robot.motors(70, 45)
         else:
             print('Error!')
 

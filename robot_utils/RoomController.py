@@ -1,5 +1,5 @@
 import time
-import Candle
+from robot_utils import Candle
 from robot_utils.RobotMain import RobotStatus
 from robot_utils.WallAvoider import WallAvoider
 
