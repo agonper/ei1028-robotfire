@@ -66,7 +66,7 @@ class RobotMain:
         self._publisher = publisher
 
     def _step_inside_room(self):
-        for _ in range(15):
+        for _ in range(12):
             self._wall_avoider.move_without_crashing()
             time.sleep(0.1)
 
