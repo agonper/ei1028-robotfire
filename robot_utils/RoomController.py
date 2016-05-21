@@ -14,9 +14,9 @@ class RobotSide:
     @staticmethod
     def get_closer_to(side):
         if side == RobotSide.Left:
-            return -20, 20
+            return -25, 25
         if side == RobotSide.Right:
-            return 20, -20
+            return 25, -25
 
 
 class RoomController:
@@ -48,18 +48,16 @@ class RoomController:
             farthest_side, closest_side = closest_side, farthest_side
 
         try:
-            while distances[closest_side] > 16:
+            while distances[closest_side] > 18:
                 distances = self._look_for_candle_getting_closer_to(closest_side)
 
-            while distances[farthest_side] > 16:
+            while distances[farthest_side] > 18:
                 distances = self._look_for_candle_getting_closer_to(farthest_side)
 
         except StopIteration:
             return RobotStatus.FIRE_ROOM
 
         print("No candle found")
-
-        robot.motors(0, 0)
         return RobotStatus.EMPTY_ROOM
 
     def _look_for_candle_getting_closer_to(self, side_to_approach):
