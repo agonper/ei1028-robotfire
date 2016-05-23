@@ -14,9 +14,9 @@ class RobotSide:
     @staticmethod
     def get_closer_to(side):
         if side == RobotSide.Left:
-            return -25, 25
+            return -30, 30
         if side == RobotSide.Right:
-            return 25, -25
+            return 30, -30
 
 
 class RoomController:
@@ -31,16 +31,16 @@ class RoomController:
         self._align_with_candle()
         self._move_towards_the_candle()
         print("Aligned!!")
-        for i in range(10):
+        for i in range(20):
             # while self._candle_is_on():
-            robot.fan(200)
+            robot.fan(250)
             time.sleep(0.1)
         time.sleep(1.0)
         robot.fan(0)
 
     def evaluate_room(self):
         robot = self._robot
-        
+
         distances = self._calculate_distances()
         farthest_side = RobotSide.Right
         closest_side = RobotSide.Left
@@ -56,6 +56,14 @@ class RoomController:
 
         except StopIteration:
             return RobotStatus.FIRE_ROOM
+
+        m_l, m_r = RobotSide.get_closer_to(closest_side)
+        robot.motors(2 * m_l, 2 * m_r)
+        time.sleep(0.6)
+        robot.motors(80, 80)
+        time.sleep(0.5)
+        robot.motors(80, -80)
+        time.sleep(1.0)
 
         print("No candle found")
         return RobotStatus.EMPTY_ROOM
@@ -101,12 +109,12 @@ class RoomController:
         found, x, y, w, h = self._get_candle_data()
         count = 0
         while w < 720 * APPROX_RATIO:
-            print("{0} / {1}".format(w, 720*APPROX_RATIO))
-            if count >= 5:
+            print("{0} / {1}".format(w, 720 * APPROX_RATIO))
+            if count >= 4:
                 count = 0
                 self._align_with_candle()
 
-            robot.motors(50, 50)
+            robot.motors(48, 50)
             time.sleep(0.1)
             found, x, y, w, h = self._get_candle_data()
             count += 1

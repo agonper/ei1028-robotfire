@@ -9,8 +9,9 @@ from robot_utils.WallAvoider import WallAvoider
 
 __author__ = 'Alberto'
 
-TIME_BETWEEN_NOTIFICATIONS = 2.0
+TIME_BETWEEN_NOTIFICATIONS = 1.5
 BEHAVIOR = "Simple"
+
 
 class RobotStatus:
     START_ROOM = "START_ROOM"
@@ -66,9 +67,10 @@ class RobotMain:
         self._publisher = publisher
 
     def _step_inside_room(self):
-        for _ in range(12):
+        for _ in range(10):
             self._wall_avoider.move_without_crashing()
             time.sleep(0.1)
+
 
 def main():
     agent_robot = Robot(ULTRASONIC_CONFIG)
@@ -78,7 +80,6 @@ def main():
     room_controller = RoomController(agent_robot, camera=camera, stream=PiRGBArray(camera))
     wall_avoider = WallAvoider(agent_robot, kill_signal=kill_signal)
     light_detector = LineDetectorPublisher(agent_robot, kill_signal=kill_signal)
-    light_detector.daemon = True
 
     try:
         brain_robot = RobotMain(robot=agent_robot, wall_avoider=wall_avoider, room_controller=room_controller)
@@ -92,6 +93,7 @@ def main():
         agent_robot.terminate()
         camera.close()
         print("END")
+
 
 if __name__ == '__main__':
     main()

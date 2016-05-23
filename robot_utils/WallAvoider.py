@@ -4,12 +4,12 @@ import time
 
 # S = [230, 248, 266, 297, 350, 445, 680, 760]
 
-# S_R = [217, 230, 252, 289, 330, 409, 588, 667]
-# S_L = [218, 241, 286, 300, 332, 407, 577, 675]
-
-S_R = [230, 241, 262, 294, 348, 455, 719, 740]
-S_L = [239, 245, 258, 285, 341, 438, 700, 762]
+# S_R = [230, 241, 262, 294, 348, 455, 719, 740]
+# S_L = [239, 245, 258, 285, 341, 438, 700, 762]
 D = [28, 24, 20, 16, 12, 8, 4, 3]
+
+S_R = [216, 230, 258, 286, 342, 442, 685, 760]
+S_L = [220, 238, 260, 292, 349, 452, 710, 752]
 
 
 class WallAvoider:
@@ -33,12 +33,12 @@ class WallAvoider:
                 robot.motors(75, 40)
             else:
                 if d_r < d_l:
-                    robot.motors(40, 60)
+                    robot.motors(50, 60)
                 else:
-                    robot.motors(60, 40)
+                    robot.motors(60, 50)
         else:
             print('Error!')
-            
+
     def _start_detecting(self):
         def detector(that):
             while True:
@@ -52,7 +52,6 @@ class WallAvoider:
                 time.sleep(0.1)
 
         threading.Thread(target=detector, args=(self,)).start()
-
 
     @staticmethod
     def interpolate_distances(sensor_values):
